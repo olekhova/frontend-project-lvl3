@@ -6,4 +6,4 @@
 
 [![Build Status](https://travis-ci.com/olekhova/frontend-project-lvl3.svg?branch=main)](https://travis-ci.com/olekhova/frontend-project-lvl3)
 
-[Проект на Vercel](https://frontend-project-lvl3-ivory-two.vercel.app)
+[Проект на Vercel](https://frontend-project-lvl3-olekhova.vercel.app/)
