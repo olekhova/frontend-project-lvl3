@@ -7,5 +7,3 @@
 [![Build Status](https://travis-ci.com/olekhova/frontend-project-lvl3.svg?branch=main)](https://travis-ci.com/olekhova/frontend-project-lvl3)
 
 [Проект на Vercel](https://frontend-project-lvl3-olekhova.vercel.app/)
-
-travis bump
