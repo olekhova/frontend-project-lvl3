@@ -1,12 +1,12 @@
 import * as yup from 'yup';
-import onChange from 'on-change';
 import _ from 'lodash';
+import view from './view.js';
 // import axios from 'axios';
 
-const feedbackEl = document.querySelector('.feedback');
-const form = document.querySelector('form');
-const inputEl = form.querySelector('[name="url"]');
-const submitButton = form.querySelector('[type="submit"]');
+import processFeeds from './feedProcessor.js';
+
+const formEl = document.querySelector('form');
+const inputEl = formEl.querySelector('[name="url"]');
 
 const schema = yup.object().shape({
   url: yup.string().url().required().matches(/\.(rss)$/),
@@ -14,6 +14,7 @@ const schema = yup.object().shape({
 
 const validate = (fields) => {
   try {
+    // console.log('Validating:', fields);
     schema.validateSync(fields, { abortEarly: false });
     return {};
   } catch (e) {
@@ -21,18 +22,23 @@ const validate = (fields) => {
   }
 };
 
-const updateValidationState = (watchedState) => {
-  const ret = watchedState;
-  const errors = validate(ret.form.fields);
-  ret.form.valid = _.isEqual(errors, {});
-  ret.form.errors = errors;
-  return ret;
-};
+// const updateValidationState = (watchedState) => {
+//   /*
+//   const errors = validate(watchedState.form.fields);
+//   watchedState.form.errors = errors;
+//   watchedState.form.valid = _.isEqual(errors, {});
+//   */
+//   const result = watchedState;
+//   const errors = validate(result.form.fields);
+//   result.form.valid = _.isEqual(errors, {});
+//   result.form.errors = errors;
+//   return result;
+// };
 
 export default () => {
   const state = {
     form: {
-      processState: 'filling',
+      processState: '',
       fields: {
         url: '',
       },
@@ -43,55 +49,50 @@ export default () => {
     posts: [],
   };
 
-  let watchedState = onChange(state, (path, value) => {
-    switch (path) {
-      /* case 'form.processState':
-        processStateHandler(value);
-        break;  */
-      case 'form.valid':
-        if (!value) {
-          submitButton.disabled = !value;
-          feedbackEl.innerHTML = 'Ссылка должна быть валидным URL';
-          inputEl.classList.add('is-invalid');
-        } else {
-          submitButton.disabled = !value;
-          feedbackEl.innerHTML = '';
-          inputEl.classList.remove('is-invalid');
-        }
-        break;
-      /* case 'form.errors':
-        renderErrors(fieldElements, value);
-        break; */
-      default:
-        break;
-    }
-  });
+  const watchedState = view(state);
+  // inputEl.addEventListener('input', (e) => {
+  //   e.preventDefault();
+  //   watchedState.form.fields.url = e.target.value;
+  //   console.log('Validating:', watchedState.form);
+  //   const errors = validate(watchedState.form.fields);
+  //   watchedState.form.errors = errors;
+  //   watchedState.form.valid = _.isEqual(errors, {});
+  //   console.log('updateValidation:', watchedState.form.valid, watchedState.form.errors);
+  // });
 
-  inputEl.addEventListener('input', (e) => {
+  formEl.addEventListener('submit', (e) => {
     e.preventDefault();
-    watchedState.form.fields.url = e.target.value;
-    watchedState = updateValidationState(watchedState);
-    console.log('updateValidation:', watchedState);
-  });
-  /*
-  form.addEventListener('submit', (e) => {
-    e.preventDefault();
-    const data = new FormData(e);
-    try {
-      schema.validateSync(data);
-    }
-    catch {
-      watchedState.form.valid = false;
-    }
-  });
-*/
+    const formData = new FormData(e.target);
+    watchedState.form.fields.url = formData.get('url');
 
-  form.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    watchedState.form.processState = 'sending';
-    try {
-      // await axios.post(routes.usersPath(), watchedState.form.fields);
+    // watchedState.form.fields.url = e.target.value;
+    console.log('Validating:', watchedState.form);
+    const errors = validate(watchedState.form.fields);
+    watchedState.form.errors = errors;
+    watchedState.form.valid = _.isEqual(errors, {});
+    console.log('updateValidation:', watchedState.form.valid, watchedState.form.errors);
+    if (!watchedState.form.valid) {
       watchedState.form.processState = 'finished';
+      inputEl.focus();
+      return;
+    }
+    watchedState.form.processState = 'adding';
+    //console.log('Validating2:', watchedState.form);
+    if (watchedState.feeds.includes(watchedState.form.fields.url)) {
+      console.log('Уже добавлен');
+    } else {
+      watchedState.feeds.push(watchedState.form.fields.url);
+      console.log('Список фидов:', watchedState.feeds );
+      processFeeds(watchedState.feeds);
+    }
+
+
+
+    /*
+    try {
+      axios.post(routes.usersPath(), watchedState.form.fields).then(() => {
+        watchedState.form.processState = 'finished';
+      });
     } catch (err) {
       // В реальных приложениях также требуется корректно обрабатывать сетевые ошибки
       watchedState.form.processError = 'network error';
@@ -99,5 +100,10 @@ export default () => {
       // здесь это опущено в целях упрощения приложения
       throw err;
     }
+    */
+
+    watchedState.form.processState = 'finished';
+    formEl.reset();
+    inputEl.focus();
   });
 };
