@@ -49,6 +49,8 @@ const createFeedEl = (title, description) => {
 
 const renderFeeds = (feeds) => {
   feedsTitleEl.innerHTML = 'Фиды';
+  feedsUlEl.innerHTML = '';
+  console.log('feeds:', feeds);
   _.forEach(feeds, (feed) => {
     const feedLiEl = createFeedEl(feed.title, feed.description);
     feedsUlEl.append(feedLiEl);
@@ -80,6 +82,7 @@ const createPostEl = (title, id, url) => {
 const renderPosts = (posts) => {
   console.log('rendering posts:', posts);
   postsTitleEl.innerHTML = 'Посты';
+  postsUlEl.innerHTML = '';
   _.forEach(posts, (post) => {
     const postLiEl = createPostEl(post.title, post.id, post.url);
     postsUlEl.append(postLiEl);

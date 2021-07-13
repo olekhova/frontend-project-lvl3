@@ -1,4 +1,4 @@
-import _ from 'lodash';
+import _, { uniqueId } from 'lodash';
 
 export default (id, xml) => {
   const domparser = new DOMParser();
@@ -8,9 +8,12 @@ export default (id, xml) => {
     title: element.querySelector('title').textContent,
     description: element.querySelector('description').textContent,
     url: element.querySelector('link').textContent,
+    feedId: id,
+    id: uniqueId(),
   }));
   feed.title = parsed.querySelector('title').textContent;
   feed.description = parsed.querySelector('description').textContent;
+  feed.id = id;
   console.log('feed', feed);
   return feed;
 };
