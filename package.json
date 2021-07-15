@@ -49,6 +49,7 @@
     "autoprefixer": "^10.2.6",
     "axios": "^0.21.1",
     "bootstrap": "^5.0.1",
+    "i18next": "^20.3.3",
     "lodash": "^4.17.21",
     "on-change": "^3.0.2",
     "postcss-cli": "^8.3.1",

@@ -1,4 +1,4 @@
-import _, { uniqueId } from 'lodash';
+import _ from 'lodash';
 import axios from 'axios';
 import parser from './parser.js';
 
@@ -11,7 +11,7 @@ export default (state) => _.forEach(state.urls, (url) => {
 
   axios.get(`https://hexlet-allorigins.herokuapp.com/get?url=${encodeURIComponent(url)}`).then((result) => {
     // console.log('Фид получен:', result.data.contents);
-    const id = uniqueId();
+    const id = _.uniqueId();
     const parsedFeed = parser(id, result.data.contents);
     // eslint-disable-next-line  no-param-reassign
     state.feeds.push({ title: parsedFeed.title, description: parsedFeed.description, id });
