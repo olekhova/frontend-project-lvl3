@@ -3,7 +3,7 @@ import axios from 'axios';
 import parser from './parser.js';
 
 export default (state) => _.forEach(state.urls, (url) => {
-  const timer = 5000;
+  const timer = 500000;
   // eslint-disable-next-line  no-param-reassign
   state.feeds = [];
   // eslint-disable-next-line  no-param-reassign

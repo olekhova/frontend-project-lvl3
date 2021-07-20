@@ -10,6 +10,7 @@ export default (id, xml) => {
     url: element.querySelector('link').textContent,
     feedId: id,
     id: _.uniqueId(),
+    isVisited: false,
   }));
   feed.title = parsed.querySelector('title').textContent;
   feed.description = parsed.querySelector('description').textContent;

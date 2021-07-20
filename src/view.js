@@ -1,5 +1,6 @@
 import _ from 'lodash';
 import onChange from 'on-change';
+import handlers from './handlers.js';
 
 const feedbackEl = document.querySelector('.feedback');
 const formEl = document.querySelector('form');
@@ -31,6 +32,8 @@ const processStateHandler = (value) => {
   }
 };
 
+const postUpdater = { setVisited: null };
+
 export default (state, i18nInstance) => {
   const renderFeedback = (value) => {
     if (value.isRssExist) {
@@ -56,10 +59,10 @@ export default (state, i18nInstance) => {
     liEl.className = 'list-group-item border-0 border-end-0';
     const h3El = document.createElement('h3');
     h3El.className = 'h6 m-0';
-    h3El.innerHTML = `${title}`;
+    h3El.innerHTML = title;
     const pEl = document.createElement('p');
     pEl.className = 'm-0 small text-black-50';
-    pEl.innerHTML = `${description}`;
+    pEl.innerHTML = description;
     liEl.append(h3El);
     liEl.append(pEl);
     return liEl;
@@ -74,23 +77,27 @@ export default (state, i18nInstance) => {
     });
   };
 
-  const createPostEl = (title, id, url) => {
+  const createPostEl = (post) => {
+    const {
+      title, id, url, isVisited,
+    } = post;
     const liEl = document.createElement('li');
     liEl.className = 'list-group-item d-flex justify-content-between align-items-start border-0 border-end-0';
     const aEl = document.createElement('a');
-    aEl.innerHTML = `${title}`;
-    aEl.className = 'fw-bold';
+    aEl.innerHTML = title;
+    aEl.className = isVisited ? 'fw-normal' : 'fw-bold';
     aEl.setAttribute('href', url);
     aEl.setAttribute('data-id', id);
     aEl.setAttribute('target', '_blank');
-    // aEl.setAttribute('rel', 'noopener noreferrer');
+    aEl.setAttribute('rel', 'noopener noreferrer');
     const buttonEl = document.createElement('button');
     buttonEl.innerHTML = i18nInstance.t('view');
     buttonEl.className = 'btn btn-outline-primary btn-sm';
-    buttonEl.setAttribute('type', 'type');
+    buttonEl.setAttribute('type', 'button');
     buttonEl.setAttribute('data-id', id);
-    // buttonEl.setAttribute('data-bs-toggle', 'modal');
-    // buttonEl.setAttribute('data-bs-target', '#modal');
+    buttonEl.setAttribute('data-bs-toggle', 'modal');
+    buttonEl.setAttribute('data-bs-target', '#modal');
+    buttonEl.addEventListener('click', () => handlers.handleViewButton(post, postUpdater));
     liEl.append(aEl);
     liEl.append(buttonEl);
     return liEl;
@@ -99,13 +106,16 @@ export default (state, i18nInstance) => {
   const renderPosts = (posts) => {
     postsTitleEl.innerHTML = i18nInstance.t('postsTitle');
     postsUlEl.innerHTML = '';
+    // console.log('rendering posts:', posts);
     _.forEach(posts, (post) => {
-      const postLiEl = createPostEl(post.title, post.id, post.url);
+      // console.log('Post to render:', post);
+      const postLiEl = createPostEl(post);
       postsUlEl.append(postLiEl);
     });
   };
 
   const watchedState = onChange(state, (path, value) => {
+    console.log('changed: ', path);
     switch (path) {
       case 'form.processState':
         processStateHandler(value);
@@ -122,6 +132,15 @@ export default (state, i18nInstance) => {
       default:
         break;
     }
+    if (path.startsWith('posts.') && path.endsWith('.isVisited')) {
+      renderPosts(state.posts);
+      console.log('re-render with new visited');
+    }
   });
+
+  postUpdater.setVisited = (postId, visited) => {
+    _.find(watchedState.posts, (post) => post.id === postId).isVisited = visited;
+  };
+
   return watchedState;
 };
