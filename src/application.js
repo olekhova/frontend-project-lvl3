@@ -76,7 +76,6 @@ export default () => {
     }
     watchedState.form.processState = 'adding';
     watchedState.urls.push(watchedState.form.field.url);
-    // console.log('Список фидов:', watchedState.feeds);
     processFeeds(watchedState);
 
     watchedState.form.processState = 'finished';

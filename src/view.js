@@ -106,16 +106,13 @@ export default (state, i18nInstance) => {
   const renderPosts = (posts) => {
     postsTitleEl.innerHTML = i18nInstance.t('postsTitle');
     postsUlEl.innerHTML = '';
-    // console.log('rendering posts:', posts);
     _.forEach(posts, (post) => {
-      // console.log('Post to render:', post);
       const postLiEl = createPostEl(post);
       postsUlEl.append(postLiEl);
     });
   };
 
   const watchedState = onChange(state, (path, value) => {
-    console.log('changed: ', path);
     switch (path) {
       case 'form.processState':
         processStateHandler(value);
@@ -134,7 +131,6 @@ export default (state, i18nInstance) => {
     }
     if (path.startsWith('posts.') && path.endsWith('.isVisited')) {
       renderPosts(state.posts);
-      console.log('re-render with new visited');
     }
   });
 

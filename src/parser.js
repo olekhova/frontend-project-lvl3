@@ -15,6 +15,5 @@ export default (id, xml) => {
   feed.title = parsed.querySelector('title').textContent;
   feed.description = parsed.querySelector('description').textContent;
   feed.id = id;
-  // console.log('feed', feed);
   return feed;
 };

@@ -26,7 +26,6 @@ const closeModal = () => {
 
 const handleViewButton = (post, postUpdater) => {
   postUpdater.setVisited(post.id, true);
-  console.log('post set to visited:', post);
   openModal(post);
   closeEls.forEach((closeEl) => closeEl.addEventListener('click', () => closeModal()));
 };
