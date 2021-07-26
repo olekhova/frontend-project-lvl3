@@ -2,39 +2,39 @@ import _ from 'lodash';
 import onChange from 'on-change';
 import handlers from './handlers.js';
 
-const feedbackEl = document.querySelector('.feedback');
-const formEl = document.querySelector('form');
-const submitButtonEl = formEl.querySelector('[type="submit"]');
-const inputEl = formEl.querySelector('[name="url"]');
-const feedsEl = document.querySelector('.feeds');
-const feedsTitleEl = feedsEl.querySelector('h2');
-const feedsUlEl = feedsEl.querySelector('ul');
-const postsEl = document.querySelector('.posts');
-const postsTitleEl = postsEl.querySelector('h2');
-const postsUlEl = postsEl.querySelector('ul');
-
-const processStateHandler = (value) => {
-  switch (value) {
-    case 'sending':
-      submitButtonEl.disabled = true;
-      break;
-    case 'failed':
-      submitButtonEl.disabled = false;
-      break;
-    case 'finished':
-      submitButtonEl.disabled = false;
-      break;
-    case 'adding':
-      submitButtonEl.disabled = true;
-      break;
-    default:
-      throw new Error(`Unknown state: ${value}`);
-  }
-};
-
-const postUpdater = { setVisited: null };
-
 export default (state, i18nInstance) => {
+  const feedbackEl = document.querySelector('.feedback');
+  const formEl = document.querySelector('form');
+  const submitButtonEl = formEl.querySelector('[type="submit"]');
+  const inputEl = formEl.querySelector('[name="url"]');
+  const feedsEl = document.querySelector('.feeds');
+  const feedsTitleEl = feedsEl.querySelector('h2');
+  const feedsUlEl = feedsEl.querySelector('ul');
+  const postsEl = document.querySelector('.posts');
+  const postsTitleEl = postsEl.querySelector('h2');
+  const postsUlEl = postsEl.querySelector('ul');
+
+  const processStateHandler = (value) => {
+    switch (value) {
+      case 'sending':
+        submitButtonEl.disabled = true;
+        break;
+      case 'failed':
+        submitButtonEl.disabled = false;
+        break;
+      case 'finished':
+        submitButtonEl.disabled = false;
+        break;
+      case 'adding':
+        submitButtonEl.disabled = true;
+        break;
+      default:
+        throw new Error(`Unknown state: ${value}`);
+    }
+  };
+
+  const postUpdater = { setVisited: null };
+
   const renderFeedback = (value) => {
     if (value.isRssExist) {
       submitButtonEl.disabled = false;
