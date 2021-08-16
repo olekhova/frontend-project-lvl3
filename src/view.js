@@ -36,21 +36,33 @@ export default (state, i18nInstance) => {
   const postUpdater = { setVisited: null };
 
   const renderFeedback = (value) => {
-    if (value.isRssExist) {
-      submitButtonEl.disabled = false;
-      feedbackEl.classList.add('text-danger');
-      feedbackEl.innerHTML = i18nInstance.t('alreadyExists');
-      inputEl.classList.add('is-invalid');
-    } else if (!value.isFormValid) {
-      submitButtonEl.disabled = false;
-      feedbackEl.classList.add('text-danger');
-      feedbackEl.innerHTML = i18nInstance.t('invalidUrl');
-      inputEl.classList.add('is-invalid');
-    } else {
-      submitButtonEl.disabled = false;
-      feedbackEl.classList.remove('text-danger');
-      feedbackEl.innerHTML = i18nInstance.t('rssLoaded');
-      inputEl.classList.remove('is-invalid');
+    switch (value) {
+      case '':
+        submitButtonEl.disabled = false;
+        feedbackEl.classList.remove('text-danger');
+        feedbackEl.innerHTML = i18nInstance.t('rssLoaded');
+        inputEl.classList.remove('is-invalid');
+        break;
+      case 'invalidUrl':
+        submitButtonEl.disabled = false;
+        feedbackEl.classList.add('text-danger');
+        feedbackEl.innerHTML = i18nInstance.t('invalidUrl');
+        inputEl.classList.add('is-invalid');
+        break;
+      case 'alreadyExists':
+        submitButtonEl.disabled = false;
+        feedbackEl.classList.add('text-danger');
+        feedbackEl.innerHTML = i18nInstance.t('alreadyExists');
+        inputEl.classList.add('is-invalid');
+        break;
+      case 'invalidRSS':
+        submitButtonEl.disabled = false;
+        feedbackEl.classList.add('text-danger');
+        feedbackEl.innerHTML = i18nInstance.t('invalidRSS');
+        inputEl.classList.add('is-invalid');
+        break;
+      default:
+        throw new Error(`Unknown error: ${value}`);
     }
   };
 
@@ -117,7 +129,7 @@ export default (state, i18nInstance) => {
       case 'form.processState':
         processStateHandler(value);
         break;
-      case 'form.feedback':
+      case 'error':
         renderFeedback(value);
         break;
       case 'feeds':

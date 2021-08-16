@@ -3,9 +3,12 @@ import * as yup from 'yup';
 import { setLocale } from 'yup';
 import i18next from 'i18next';
 import _ from 'lodash';
+import axios from 'axios';
+
 import view from './view.js';
 import processFeeds from './feedProcessor.js';
 import resources from './locales';
+import parser from './parser.js';
 
 export default () => {
   const formEl = document.querySelector('form');
@@ -44,11 +47,8 @@ export default () => {
       field: {
         url: '',
       },
-      feedback: {
-        isFormValid: false,
-        isRssExist: false,
-      },
     },
+    error: '',
     urls: [],
     feeds: [],
     posts: [],
@@ -58,29 +58,42 @@ export default () => {
 
   formEl.addEventListener('submit', (e) => {
     e.preventDefault();
-    watchedState.form.feedback = { isFormValid: true, isRssExist: false };
+    watchedState.error = '';
     const formData = new FormData(e.target);
     watchedState.form.field.url = formData.get('url');
 
-    const errors = validate(watchedState.form.field);
-    if (!_.isEqual(errors, {})) {
-      watchedState.form.feedback = { isFormValid: false, isRssExist: false };
+    const errorsUrl = validate(watchedState.form.field);
+    if (!_.isEqual(errorsUrl, {})) {
+      watchedState.error = 'invalidUrl';
       watchedState.form.processState = 'finished';
       inputEl.focus();
       return;
     }
     if (watchedState.urls.includes(watchedState.form.field.url)) {
-      watchedState.form.feedback = { isFormValid: true, isRssExist: true };
+      watchedState.error = 'alreadyExists';
       watchedState.form.processState = 'finished';
       inputEl.focus();
       return;
     }
     watchedState.form.processState = 'adding';
-    watchedState.urls.push(watchedState.form.field.url);
-    processFeeds(watchedState);
-
-    watchedState.form.processState = 'finished';
-    formEl.reset();
-    inputEl.focus();
+    // check url
+    axios.get(`https://hexlet-allorigins.herokuapp.com/get?disableCache=true&url=${encodeURIComponent(watchedState.form.field.url)}`)
+      .then((result) => {
+        const id = _.uniqueId();
+        const parsedFeed = parser(id, result.data.contents);
+        if (_.has(parsedFeed, 'title') && _.has(parsedFeed, 'description')) {
+          watchedState.urls.push(watchedState.form.field.url);
+          watchedState.form.processState = 'finished';
+          watchedState.error = '';
+          processFeeds(watchedState);
+          formEl.reset();
+          inputEl.focus();
+        }
+      })
+      .catch(() => {
+        watchedState.error = 'invalidRSS';
+        formEl.reset();
+        inputEl.focus();
+      });
   });
 };
