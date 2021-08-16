@@ -38,6 +38,7 @@ export default (state, i18nInstance) => {
   const renderFeedback = (value) => {
     switch (value) {
       case '':
+      case 'ok':
         submitButtonEl.disabled = false;
         feedbackEl.classList.remove('text-danger');
         feedbackEl.innerHTML = i18nInstance.t('rssLoaded');

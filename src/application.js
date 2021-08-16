@@ -76,6 +76,7 @@ export default () => {
       return;
     }
     watchedState.form.processState = 'adding';
+    watchedState.error = 'ok';
     // check url
     axios.get(`https://hexlet-allorigins.herokuapp.com/get?disableCache=true&url=${encodeURIComponent(watchedState.form.field.url)}`)
       .then((result) => {
